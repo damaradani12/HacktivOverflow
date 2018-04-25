@@ -6,6 +6,7 @@ module.exports = {
   loginAuth: function (req, res, next) {
     if (req.headers.token) {
       let token = req.headers.token
+      console.log(token)
       jwt.verify(token, pwdtoken, function (err, decoded) {
         if (err) {
           res.status(500).json({

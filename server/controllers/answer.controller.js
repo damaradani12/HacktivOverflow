@@ -25,7 +25,7 @@ module.exports = {
     let token = req.headers.token
     let decoded = jwt.verify(token, pwdtoken)
     let userId = decoded.id    
-    let questionId = req.body.questionId
+    let questionId = req.body.id
 
     let newAnswer = new Answer ({
       answer: req.body.answer,
