@@ -7,7 +7,13 @@ module.exports = {
   getAllQuestion: function (req, res) {
     Question.find()
       .populate('owner')
-      .populate('answer')
+      .populate({
+        path: 'answer',
+        populate: {
+          path: 'owner',
+          model: 'User'
+        }
+      })
       .exec()
       .then(question => {
         res.status(200).json({
