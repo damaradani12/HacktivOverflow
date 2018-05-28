@@ -53,6 +53,7 @@ export default {
           } else {
             localStorage.setItem('token', response.data.token)
             this.$store.commit('userLogin', true)
+            this.$store.commit('setUid', response.data._id)
             swal(
               'Good job!',
               'You log in successfully!',

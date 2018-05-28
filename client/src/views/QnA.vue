@@ -25,8 +25,8 @@
           <h4>{{ question.title }}</h4>
           <p>{{ question.details }}</p>
           <span>{{ question.answer.length }} Answer
-            <a data-toggle="modal" data-target="#editQuestionModal" @click="setQuestion(question)">Edit</a>
-            <a @click="deleteQuestion(question._id)"> Delete</a>
+            <a v-if="question.owner._id === uid" data-toggle="modal" data-target="#editQuestionModal" >Edit</a>
+            <a v-if="question.owner._id === uid" @click="deleteQuestion(question._id)"> Delete</a>
           </span>
           <hr>
           <h3>Write Answer</h3>
@@ -41,7 +41,7 @@
                     <a @click="upvoteAnswer(answer._id)" class="Up"><span class="glyphicon glyphicon-circle-arrow-up"></span></a>
                 </td></tr>
                 <tr><td>
-                    <h4 class="text-center">{{ answer.vote.length }}</h4>
+                    <h4 v-if="answer.vote.length >= 0" class="text-center">{{ answer.vote.length }}</h4>
                 </td></tr>
                 <tr><td>
                     <a @click="downvoteAnswer(answer._id)" class="Down"><span class="glyphicon glyphicon-circle-arrow-down"></span></a>
@@ -51,7 +51,7 @@
             <div class="col-md-10 col-xs-9 text-left well well-sm" style="height: 100%;">
               <span style="font-size: 10px;">Posted by <strong>{{ answer.owner.name }}</strong> {{ dateFormat(answer.createdAt) }}</span>
               <h4>{{ answer.answer }}</h4>
-              <span><a @click="deleteAnswer(answer._id)">Delete</a></span>
+              <span v-if="answer.owner._id === uid"><a @click="deleteAnswer(answer._id)">Delete</a></span>
             </div>
           </div>
         </div>
@@ -91,12 +91,12 @@ export default {
     },
     upvoteAnswer: function (answerId) {
       // console.log(answerId)
-      this.$store.dispatch('upvoteAnswer', answerId)
+      this.$store.dispatch('upvoteAnswer', {answerId, questionId: this.id})
       // this.getQuestion()
     },
     downvoteAnswer: function (answerId) {
       // console.log(answerId)
-      this.$store.dispatch('downvoteAnswer', answerId)
+      this.$store.dispatch('downvoteAnswer', {answerId, questionId: this.id})
       // this.getQuestion()
     },
     dateFormat: function (date) {
@@ -111,10 +111,11 @@ export default {
       return newDate
     },
     getQuestion: function () {
-      let token = localStorage.getItem('token')
+      // let token = localStorage.getItem('token')
       // let url = this.$store.state.server + `question/${this.id}`
-      this.$store.dispatch('tokenCheck', token)
+      // this.$store.dispatch('tokenCheck', token)
       this.$store.dispatch('getQuestionById', this.id)
+      // return this.questions.filter(question => question._id === this.id)[0]
       // console.log('In Created', this.id)
       // axios.get(url)
       //   .then(response => {
@@ -156,16 +157,17 @@ export default {
       }).then(result => {
         if (result) {
           // console.log('Question Id', answerId)
-          this.$store.dispatch('deleteAnswer', answerId)
+          this.$store.dispatch('deleteAnswer', {answerId, questionId: this.id})
         }
       })
     }
-  },
-  updated: function () {
-    this.getQuestion()
-  },
+  }, // Looping Terus kalo pake
+  // updated: function () {
+  //   this.getQuestion()
+  // },
   computed: mapState([
-    'question'
+    'question',
+    'uid'
   ]),
   created: function () {
     this.getQuestion()

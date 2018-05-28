@@ -2,6 +2,7 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import axios from 'axios'
 import swal from 'sweetalert'
+import router from './router'
 
 Vue.use(Vuex)
 
@@ -11,6 +12,7 @@ export default new Vuex.Store({
     // server: 'http://localhost:3000/',
     questions: [],
     isLogin: false,
+    uid: '',
     role: '',
     question: {}
   },
@@ -20,6 +22,9 @@ export default new Vuex.Store({
     },
     userLogin: function (state, payload) {
       state.isLogin = payload
+    },
+    setUid: function (state, payload) {
+      state.uid = payload
     },
     setRole: function (state, payload) {
       state.role = payload
@@ -76,10 +81,11 @@ export default new Vuex.Store({
     editQuestion: function ({dispatch, commit}, question) {
       let url = this.state.server + 'question/edit/' + question._id
       let token = localStorage.getItem('token')
-      console.log('Dari Store', question)
+      // console.log('Dari Store', question)
       axios.put(url, question, {headers: {token}})
         .then(response => {
           dispatch('getQuestion')
+          dispatch('getQuestionById', question._id)
           swal(
             'Question!',
             'Question Succesfully Edited',
@@ -106,7 +112,9 @@ export default new Vuex.Store({
             'Question!',
             'Question Succesfully Deleted',
             'success'
-          )
+          ).then(() => {
+            router.push('/')
+          })
         })
         .catch(err => {
           console.log(err)
@@ -120,11 +128,12 @@ export default new Vuex.Store({
     upvoteQuestion: function ({dispatch, commit}, questionId) {
       let url = this.state.server + 'question/upvote/' + questionId
       let token = localStorage.getItem('token')
-      console.log('Upvote in store', questionId)
+      // console.log('Upvote in store', questionId)
       axios.put(url, {}, {headers: {token}})
         .then(response => {
-          console.log(response)
+          // console.log(response)
           dispatch('getQuestion')
+          dispatch('getQuestionById', questionId)
         })
         .catch(err => {
           console.log(err)
@@ -142,6 +151,7 @@ export default new Vuex.Store({
       axios.put(url, {}, {headers: {token}})
         .then(response => {
           dispatch('getQuestion')
+          dispatch('getQuestionById', questionId)
         })
         .catch(err => {
           console.log(err)
@@ -160,6 +170,7 @@ export default new Vuex.Store({
       axios.post(url, question, {headers: {token}})
         .then(response => {
           dispatch('getQuestion')
+          dispatch('getQuestionById', question.id)
           swal(
             'New Answer!',
             'Answer Succesfully Created',
@@ -175,13 +186,14 @@ export default new Vuex.Store({
           })
         })
     },
-    deleteAnswer: function ({dispatch, commit}, answerId) {
+    deleteAnswer: function ({dispatch, commit}, {answerId, questionId}) {
       let url = this.state.server + 'answer/delete/' + answerId
       let token = localStorage.getItem('token')
 
       axios.delete(url, {headers: {token}})
         .then(response => {
           dispatch('getQuestion')
+          dispatch('getQuestionById', questionId)
           swal(
             'New Answer!',
             'Answer Succesfully Created',
@@ -197,14 +209,15 @@ export default new Vuex.Store({
           })
         })
     },
-    upvoteAnswer: function ({dispatch, commit}, answerId) {
+    upvoteAnswer: function ({dispatch, commit}, {answerId, questionId}) {
       let url = this.state.server + 'answer/upvote/' + answerId
       let token = localStorage.getItem('token')
-
+      console.log(questionId)
       axios.put(url, {}, {headers: {token}})
         .then(response => {
-          console.log('Upvote answer', response)
+          // console.log('Upvote answer', response)
           dispatch('getQuestion')
+          dispatch('getQuestionById', questionId)
         }) // console.log(JSON.stringify(questions.data.data, null, 2))
         .catch(err => {
           console.log(err)
@@ -215,13 +228,14 @@ export default new Vuex.Store({
           })
         })
     },
-    downvoteAnswer: function ({dispatch, commit}, answerId) {
+    downvoteAnswer: function ({dispatch, commit}, {answerId, questionId}) {
       let url = this.state.server + 'answer/downvote/' + answerId
       let token = localStorage.getItem('token')
 
       axios.put(url, {}, {headers: {token}})
         .then(response => {
           dispatch('getQuestion')
+          dispatch('getQuestionById', questionId)
         })
         .catch(err => {
           console.log(err)
@@ -238,9 +252,10 @@ export default new Vuex.Store({
         let url = this.state.server + 'user/checktoken'
         axios.get(url, {headers: {token}})
           .then(response => {
-            // console.log('Token ====> ', response.data.user.role)
+            // console.log('Token ====> ', response.data.user)
             commit('userLogin', response.data.states)
             commit('setRole', response.data.user.role)
+            commit('setUid', response.data.user._id)
           })
           .catch(err => {
             console.log(err)

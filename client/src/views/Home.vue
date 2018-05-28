@@ -16,6 +16,9 @@ export default {
   },
   created: function () {
     this.$store.dispatch('getQuestion')
+  },
+  mounted: function () {
+    this.$store.commit('specificQuestion', {})
   }
 }
 </script>
