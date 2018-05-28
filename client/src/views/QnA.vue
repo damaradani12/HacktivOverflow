@@ -41,7 +41,7 @@
                     <a @click="upvoteAnswer(answer._id)" class="Up"><span class="glyphicon glyphicon-circle-arrow-up"></span></a>
                 </td></tr>
                 <tr><td>
-                    <h4 v-if="answer.vote.length >= 0" class="text-center">{{ answer.vote.length }}</h4>
+                    <h4 class="text-center">{{ answer.vote.length }}</h4>
                 </td></tr>
                 <tr><td>
                     <a @click="downvoteAnswer(answer._id)" class="Down"><span class="glyphicon glyphicon-circle-arrow-down"></span></a>
@@ -169,7 +169,7 @@ export default {
     'question',
     'uid'
   ]),
-  created: function () {
+  mounted: function () {
     this.getQuestion()
   }
 }

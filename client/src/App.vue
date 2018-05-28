@@ -55,6 +55,7 @@ export default {
         if (result) {
           localStorage.removeItem('token')
           this.$store.commit('userLogin', false)
+          this.$store.commit('setUid', '')
           swal(
             'Log out!',
             'You have been log out.',
