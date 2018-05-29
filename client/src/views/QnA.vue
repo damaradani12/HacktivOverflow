@@ -132,8 +132,16 @@ export default {
         id: this.id
       }
       // console.log(question)
-      this.$store.dispatch('addAnswer', question)
-      this.answer = ''
+      if (question.answer) {
+        this.$store.dispatch('addAnswer', question)
+        this.answer = ''
+      } else {
+        swal({
+          icon: 'error',
+          title: 'Oops...',
+          text: 'U need to fill the answer'
+        })
+      }
     },
     deleteQuestion: function (questionId) {
       swal({
